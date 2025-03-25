@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handwritten Math Expression Solver</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
+    <style>
+        /* General body styling */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 1.2rem;
+        }
+
+        input[type="file"] {
+            margin-top: 10px;
+            margin-bottom: 20px;
+            padding: 10px;
+            font-size: 1rem;
+            background-color: #ffffff;
+            color: #333;
+            border: 2px solid #ffffff;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        button {
+            font-size: 1rem;
+            background-color: #ff6f61;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #ff856b;
+            box-shadow: 0px 4px 10px rgba(255, 111, 97, 0.5);
+        }
+
+        h3 {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            color: #ffde59;
+        }
+
+        p {
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px auto;
+            width: 80%;
+            max-width: 600px;
+            word-wrap: break-word;
+        }
+
+        /* Add some spacing */
+        #fileInput {
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Add hover effects for file input */
+        input[type="file"]:hover {
+            border: 2px solid #ffde59;
+        }
+    </style>
+</head>
+<body>
+    <h1>Handwritten Math Expression Solver</h1>
+    
+    <label for="fileInput">Upload an Image of a Math Expression:</label>
+    <input type="file" id="fileInput" accept="image/*">
+    <br>
+    
+    <button onclick="processImage()">Solve Expression</button>
+    
+    <h3>Recognized Math Expression:</h3>
+    <p id="expressionOutput">None</p>
+    
+    <h3>Result:</h3>
+    <p id="resultOutput">None</p>
+
+    <script>
+        function processImage() {
+            let fileInput = document.getElementById('fileInput');
+            let file = fileInput.files[0];
+            
+            if (file) {
+                // Use Tesseract.js for OCR processing
+                Tesseract.recognize(
+                    file,
+                    'eng', // language
+                    {
+                        logger: (m) => console.log(m), // log progress (optional)
+                    }
+                ).then(({ data: { text } }) => {
+                    document.getElementById('expressionOutput').innerText = text;
+                    
+                    try {
+                        // Try evaluating the math expression
+                        let result = evaluateMathExpression(text);
+                        document.getElementById('resultOutput').innerText = result;
+                    } catch (e) {
+                        document.getElementById('resultOutput').innerText = "Error evaluating expression.";
+                    }
+                });
+            } else {
+                alert("Please select an image first.");
+            }
+        }
+
+        // Function to evaluate math expressions
+        function evaluateMathExpression(expression) {
+            // Clean and evaluate the expression
+            expression = expression.replace(/[^0-9+\-*/().^]/g, ''); // Remove any invalid characters
+            return eval(expression); // Simple eval function, can be replaced by more secure parsers
+        }
+    </script>
+</body>
+</html>
